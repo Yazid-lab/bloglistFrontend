@@ -4,17 +4,17 @@ import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    blogService
+      .getAll()
+      .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
   }, [])
 
   useEffect(() => {
@@ -68,26 +68,46 @@ const App = () => {
       <button type='submit'>login</button>
     </form>
   )
-  const newBlogForm = async (event) => {
-    event.preventDefault()
+  const newBlogForm = async (blogToAdd) => {
     try {
-      const blog = { title, author, url }
-      const returnedBlog = await blogService.create(blog)
-      setTitle('')
-      setUrl('')
-      setAuthor('')
+      const returnedBlog = await blogService.create(blogToAdd)
       setBlogs(blogs.concat(returnedBlog))
       setErrorMessage(`a new blog ${returnedBlog.title} added`)
-      event.target.reset()
     } catch ({ response }) {
-      setTitle('')
-      setUrl('')
-      setAuthor('')
       setErrorMessage(response.data.error)
       setTimeout(() => setErrorMessage(null), 5000)
     }
   }
-
+  const likeBlog = async (id) => {
+    const blogToLike = blogs.find((blog) => blog.id === id)
+    if (!blogToLike) {
+      setErrorMessage("can't find this blog ")
+    } else {
+      const updatedBlog = {
+        ...blogToLike,
+        likes: blogToLike.likes + 1,
+        user: blogToLike.user.id,
+      }
+      try {
+        const returnedBlog = await blogService.update(id, updatedBlog)
+        setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)))
+      } catch (error) {
+        setErrorMessage('error happened ahhhh')
+      }
+    }
+  }
+  const deleteBlog = async (id, title) => {
+    const deleteConfirmation = window.confirm(`do you wanna delete ${title}`)
+    if (!deleteConfirmation) {
+      return
+    }
+    try {
+      await blogService.remove(id)
+      setBlogs(blogs.filter((blog) => blog.id !== id))
+    } catch (error) {
+      setErrorMessage('error while deleting ahhhh')
+    }
+  }
   return (
     <div>
       <Notification message={errorMessage} />
@@ -98,38 +118,17 @@ const App = () => {
           <h2>blogs</h2>
           {user.username} is logged in
           <button onClick={handleLogout}>logout</button>
-            <Togglable buttonLabel='New Blog'>
-          <form onSubmit={newBlogForm}>
-            title{' '}
-            <input
-              type='text'
-              value={title}
-              name='title'
-              onChange={({ target }) => setTitle(target.value)}
-            />{' '}
-            <br />
-            author{' '}
-            <input
-              type='text'
-              value={author}
-              name='author'
-              onChange={({ target }) => setAuthor(target.value)}
-            />
-            <br />
-            url{' '}
-            <input
-              type='text'
-              value={url}
-              name='url'
-              onChange={({ target }) => setUrl(target.value)}
-            />
-            <br />
-            <button type='submit'>create</button>
-          </form>
-            </Togglable>
+          <Togglable buttonLabel='New Blog'>
+            <BlogForm createBlog={newBlogForm} />
+          </Togglable>
           <div>
             {blogs.map((blog) => (
-              <Blog key={blog.id} blog={blog} />
+              <Blog
+                key={blog.id}
+                blog={blog}
+                handleLike={likeBlog}
+                handleDelete={deleteBlog}
+              />
             ))}
           </div>
         </div>

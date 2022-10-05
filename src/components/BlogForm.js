@@ -1,32 +1,56 @@
-const BlogForm = () => {
+const { useState } = require('react')
 
+const BlogForm = ({ createBlog }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+  const newBlogForm = (event) => {
+    event.preventDefault()
+    try {
+      const blog = { title, author, url }
+      createBlog(blog)
+      setTitle('')
+      setUrl('')
+      setAuthor('')
+      event.target.reset()
+    } catch ({ response }) {
+      setTitle('')
+      setUrl('')
+      setAuthor('')
+    }
+  }
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value)
+  }
+  const handleAuthorChange = ({ target }) => {
+    setAuthor(target.value)
+  }
+  const handleUrlChange = ({ target }) => {
+    setUrl(target.value)
+  }
   return (
     <form onSubmit={newBlogForm}>
-      title{' '}
+      title
       <input
         type='text'
         value={title}
         name='title'
-        onChange={({ target }) => setTitle(target.value)}
-      />{' '}
+        onChange={handleTitleChange}
+      />
       <br />
       author{' '}
       <input
         type='text'
         value={author}
         name='author'
-        onChange={({ target }) => setAuthor(target.value)}
+        onChange={handleAuthorChange}
       />
       <br />
       url{' '}
-      <input
-        type='text'
-        value={url}
-        name='url'
-        onChange={({ target }) => setUrl(target.value)}
-      />
+      <input type='text' value={url} name='url' onChange={handleUrlChange} />
       <br />
       <button type='submit'>create</button>
     </form>
   )
 }
+export default BlogForm
