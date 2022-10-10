@@ -5,23 +5,31 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
   const hide = { display: visibleBlog ? '' : 'none' }
   const buttonLabel = visibleBlog ? 'hide' : 'view'
   return (
-    <div>
-      <span>{blog.title}</span>
-      <span> {blog.author}</span>
-      <button onClick={() => setVisibleBlog(!visibleBlog)}>
-        {buttonLabel}
-      </button>
-      <div style={hide}>
-        {blog.url}
-        <br />
-        {blog.likes}
-        <button onClick={() => handleLike(blog.id)}>like</button>
-        <br />
-        <button onClick={() => handleDelete(blog.id, blog.title)}>
-          remove
+    <li>
+      <div className='visibleDetails'>
+        <span>{blog.title}</span>
+        <span> {blog.author}</span>
+        <button onClick={() => setVisibleBlog(!visibleBlog)}>
+          {buttonLabel}
         </button>
       </div>
-    </div>
+      <div className='hiddenDetails' style={hide}>
+        <ul>
+          <li>{blog.url}</li>
+          <li>{blog.likes}</li>
+          <button id='likeButton' onClick={() => handleLike(blog.id)}>
+            like
+          </button>
+          <br />
+          <button
+            id='deleteButton'
+            onClick={() => handleDelete(blog.id, blog.title)}
+          >
+            remove
+          </button>
+        </ul>
+      </div>
+    </li>
   )
 }
 

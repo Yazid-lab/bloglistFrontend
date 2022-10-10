@@ -28,7 +28,7 @@ const Togglable = forwardRef((props, refs) => {
     </div>
   )
 })
-Togglable.propTypes ={
-  buttonLabel : PropTypes.string.isRequired
+Togglable.propTypes = {
+  buttonLabel: PropTypes.string.isRequired,
 }
 export default Togglable

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
@@ -121,7 +121,7 @@ const App = () => {
           <Togglable buttonLabel='New Blog'>
             <BlogForm createBlog={newBlogForm} />
           </Togglable>
-          <div>
+          <ul>
             {blogs.map((blog) => (
               <Blog
                 key={blog.id}
@@ -130,7 +130,7 @@ const App = () => {
                 handleDelete={deleteBlog}
               />
             ))}
-          </div>
+          </ul>
         </div>
       )}
     </div>
