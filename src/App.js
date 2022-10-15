@@ -5,11 +5,10 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   useEffect(() => {
     blogService
@@ -25,19 +24,14 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
-  const handleLogin = async (event) => {
-    event.preventDefault()
+  const handleLogin = async (submittedUser) => {
     try {
-      const user = await loginService.login({ username, password })
+      const user = await loginService.login(submittedUser)
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
     } catch (exception) {
       setErrorMessage('wrong credentials')
-      setUsername('')
-      setPassword('')
       setTimeout(() => setErrorMessage(null), 5000)
     }
   }
@@ -45,29 +39,6 @@ const App = () => {
     window.localStorage.removeItem('loggedUser')
     setUser(null)
   }
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type='text'
-          value={username}
-          name='Username'
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input
-          type='password'
-          value={password}
-          name='Password'
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type='submit'>login</button>
-    </form>
-  )
   const newBlogForm = async (blogToAdd) => {
     try {
       const returnedBlog = await blogService.create(blogToAdd)
@@ -112,7 +83,7 @@ const App = () => {
     <div>
       <Notification message={errorMessage} />
       {user === null ? (
-        loginForm()
+        <LoginForm handleSubmit={handleLogin}/>
       ) : (
         <div>
           <h2>blogs</h2>
