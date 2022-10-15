@@ -9,7 +9,7 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
       <div className='visibleDetails'>
         <span>{blog.title}</span>
         <span> {blog.author}</span>
-        <button onClick={() => setVisibleBlog(!visibleBlog)}>
+        <button id='toggle-visibility' onClick={() => setVisibleBlog(!visibleBlog)}>
           {buttonLabel}
         </button>
       </div>
@@ -17,7 +17,7 @@ const Blog = ({ blog, handleLike, handleDelete }) => {
         <ul>
           <li>{blog.url}</li>
           <li>{blog.likes}</li>
-          <button id='likeButton' onClick={() => handleLike(blog.id)}>
+          <button id='like-button' onClick={() => handleLike(blog.id)}>
             like
           </button>
           <br />
